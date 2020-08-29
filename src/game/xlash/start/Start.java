@@ -25,7 +25,7 @@ public class Start {
 			}
 		}else if(os.indexOf("mac")>=0) {
 			load("jinput-osx", ".jnilib");
-		}else if(os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") > 0 ) {
+		}else if(os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 ) {
 			if(arch.indexOf("64")>=0) {
 				load("jinput-linux64", ".so");
 			}else {
@@ -34,28 +34,29 @@ public class Start {
 		}
 		System.setProperty("java.library.path", System.getProperty("java.io.tmpdir")+"Sneks_temp/jinput_natives;"+System.getProperty("java.library.path"));
 		System.out.println("Path: " + System.getProperty("java.library.path"));
-		try {
-			Field fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");
-			fieldSysPath.setAccessible(true);
-			fieldSysPath.set(null, null);
-		} catch (NoSuchFieldException e) {
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		}
+		// try {
+		// 	Field fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");
+		// 	fieldSysPath.setAccessible(true);
+		// 	fieldSysPath.set(null, null);
+		// } catch (NoSuchFieldException e) {
+		// 	e.printStackTrace();
+		// } catch (SecurityException e) {
+		// 	e.printStackTrace();
+		// } catch (IllegalArgumentException e) {
+		// 	e.printStackTrace();
+		// } catch (IllegalAccessException e) {
+		// 	e.printStackTrace();
+		// }
 		game = new Game();
 	}
 	
 	public static void load(String file, String suff) {
 		try {
 			InputStream in = Start.class.getResource("/"+file+suff).openStream();
-			File directory = new File(System.getProperty("java.io.tmpdir")+"Sneks_temp/jinput_natives/");
+			String tempDir = System.getProperty("java.io.tmpdir")+"/Sneks_temp/jinput_natives";
+			File directory = new File(tempDir);
 			directory.mkdirs();
-			File temp = new File(System.getProperty("java.io.tmpdir")+"Sneks_temp/jinput_natives/"+file+suff);
+			File temp = new File(tempDir + "/" + file+suff);
 			if(temp.exists()) {
 				temp.delete();
 			}
