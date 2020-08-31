@@ -33,15 +33,15 @@ public class MainMenuGui extends Gui{
 		this.controllers = new ArrayList<>();
 		Controller[] cntls = ControllerEnvironment.getDefaultEnvironment().getControllers();
 		this.controllers.clear();
-		for(int i=0; i<cntls.length; i++) {
-			if((cntls[i].getType()==Type.GAMEPAD || cntls[i].getType()==Type.STICK) && cntls[i].poll()) {
+		for(int i = 0; i < cntls.length; i++) {
+			if((cntls[i].getType() == Type.GAMEPAD || cntls[i].getType() == Type.STICK) && cntls[i].poll()) {
 				this.controllers.add(cntls[i]);
 			}
 		}
-		snakes.add(new Snake((Game.window.getSize().width/4)/Game.size, (Game.window.getSize().height/4)/Game.size, 10, InputType.NUMPAD));
-		snakes.add(new Snake((Game.window.getSize().width/4)/Game.size, (Game.window.getSize().height/4)/Game.size+3, 11, InputType.WASD));
-		for(int i=0; i<this.controllers.size(); i++) {
-			snakes.add(new Snake((Game.window.getSize().width/4)/Game.size, (Game.window.getSize().height/4)/Game.size+3*(i+2), i+23, this.controllers.get(i)));
+		snakes.add(new Snake((Game.window.getSize().width/4)/Game.size, (Game.window.getSize().height/4)/Game.size, Snake.playerColors[0], InputType.WASD));
+		snakes.add(new Snake((Game.window.getSize().width/4)/Game.size, (Game.window.getSize().height/4)/Game.size+3, Snake.playerColors[1], InputType.ARROWS));
+		for(int i = 0; i < this.controllers.size() && i < Snake.playerColors.length - 2; i++) {
+			snakes.add(new Snake((Game.window.getSize().width/4)/Game.size, (Game.window.getSize().height/4)/Game.size+3*(i+2), Snake.playerColors[i + 2], this.controllers.get(i)));
 		}
 		inGame = new boolean[snakes.size()];
 		screen = 0;
@@ -101,10 +101,11 @@ public class MainMenuGui extends Gui{
 	}
 	
 	private boolean isSomeonePlaying() {
-		for(boolean b : inGame) {
-			if(b) return true;
+		int count = 0;
+		for (boolean b : inGame) {
+			if (b) count++;
 		}
-		return false;
+		return count > 1;
 	}
 	
 	@Override

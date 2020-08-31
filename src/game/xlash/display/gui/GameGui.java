@@ -80,6 +80,7 @@ public class GameGui extends Gui{
 	@Override
 	public void updateBetweenFrame() {
 		for(Snake s : game.snakes) {
+			// Poll input, and kill Snake if controller was unplugged
 			if(!s.input.pollInput()) {
 				s.dead = true;
 			}
@@ -103,17 +104,20 @@ public class GameGui extends Gui{
 			g2d.setColor(Color.green);
 			g2d.setFont(new Font("Times New Roman", Font.BOLD, 60));
 			String deathMessage = "";
-			if(game.singleWin) {
-				for(int i=0; i<game.snakes.size(); i++) {
-					if(!game.snakes.get(i).dead) {
-						deathMessage += "P"+(i+1)+" WINS!";
+			if (game.singleWin) {
+				for (int i = 0; i < game.snakes.size(); i++) {
+					if (!game.snakes.get(i).dead) {
+						deathMessage += "P" + (i + 1) + " WINS!";
 						break;
 					}
 				}
-			}else if(game.redWin) {
+			} else if (game.redWin) {
 				deathMessage += "RED TEAM WINS!";
-			}else deathMessage += "BLUE TEAM WINS!";
-			if(deathMessage.isEmpty()) deathMessage = "Y'ALL DIED!";
+			} else if (game.blueWin) {
+				deathMessage += "BLUE TEAM WINS!";
+			}
+			if (deathMessage.isEmpty())
+				deathMessage = "Y'ALL DIED!";
 			int width = g2d.getFontMetrics().stringWidth(deathMessage);
 			g2d.drawString(deathMessage, bounds.width/2-width/2, bounds.getSize().height/2);
 		}

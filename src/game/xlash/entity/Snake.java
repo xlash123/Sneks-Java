@@ -1,10 +1,10 @@
 package game.xlash.entity;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Random;
 
 import game.xlash.start.Game;
 import game.xlash.start.input.InputRegistry;
@@ -12,6 +12,17 @@ import game.xlash.start.input.InputType;
 import net.java.games.input.Controller;
 
 public class Snake {
+	
+	public static final Color[] playerColors = new Color[] {
+		Color.red,
+		Color.blue,
+		Color.yellow,
+		Color.green,
+		Color.orange,
+		Color.cyan,
+		Color.magenta,
+		Color.white
+	};
 	
 	public ArrayList<Point> points = new ArrayList<>();
 	public ArrayList<Point> prevPoints = new ArrayList<>();
@@ -21,14 +32,12 @@ public class Snake {
 	public boolean dead;
 	public boolean toDie;
 	
-	public Color colorHead, colorBody;
+	public Color bodyColor;
 	public InputRegistry input;
 	public TeamEnum team;
 	
-	public Snake(int x, int y, int seed, InputType type) {
-		Random r = new Random(seed);
-		colorHead = new Color(r.nextInt(256), r.nextInt(256), r.nextInt(256));
-		colorBody = new Color(r.nextInt(256), r.nextInt(256), r.nextInt(256));
+	public Snake(int x, int y, Color bodyColor, InputType type) {
+		this.bodyColor = bodyColor;
 		points.add(new Point(x, y));
 		points.add(new Point(x-1, y));
 		xVel = 1;
@@ -38,8 +47,8 @@ public class Snake {
 		if(type != null) this.input = new InputRegistry(type);
 	}
 	
-	public Snake(int x, int y, int seed, Controller c) {
-		this(x, y, seed, (InputType) null);
+	public Snake(int x, int y, Color bodyColor, Controller c) {
+		this(x, y, bodyColor, (InputType) null);
 		this.input = new InputRegistry(c);
 	}
 	
@@ -152,12 +161,13 @@ public class Snake {
 	}
 	
 	public void draw(Graphics2D g2d, int size) {
-		g2d.setColor(colorBody);
+		g2d.setColor(bodyColor.darker());
+		g2d.setStroke(new BasicStroke(2));
 		for(int i=1; i<points.size(); i++) {
 			Point p = points.get(i);
 			g2d.drawRect(size*p.x, size*p.y, size, size);
 		}
-		g2d.setColor(colorHead);
+		g2d.setColor(bodyColor);
 		Point head = getHead();
 		g2d.drawRect(size*head.x, size*head.y, size, size);
 	}

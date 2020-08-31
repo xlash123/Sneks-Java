@@ -24,6 +24,12 @@ public class InputRegistry {
 	
 	public boolean pollInput() {
 		switch(type) {
+		case ARROWS:
+			setUp(InputListener.isKeyDown(KeyEvent.VK_UP));
+			setDown(InputListener.isKeyDown(KeyEvent.VK_DOWN));
+			setLeft(InputListener.isKeyDown(KeyEvent.VK_LEFT));
+			setRight(InputListener.isKeyDown(KeyEvent.VK_RIGHT));
+			break;
 		case NUMPAD:
 			setUp(InputListener.isKeyDown(KeyEvent.VK_NUMPAD8));
 			setDown(InputListener.isKeyDown(KeyEvent.VK_NUMPAD5));
@@ -38,7 +44,7 @@ public class InputRegistry {
 			break;
 		case CONTROLLER:
 			if(valid && controller.poll()) {
-				float x=0, y=0;
+				float x = 0, y = 0;
 				boolean up = false, down = false, left = false, right = false;
 				for(Component c : controller.getComponents()) {
 					if(c.getName().equals("X Axis")) {
@@ -47,17 +53,17 @@ public class InputRegistry {
 						y = -c.getPollData();
 					}else if(c.getName().equals("Hat Switch")) {
 						float data = c.getPollData();
-						up = data==0.25||data==0.125||data==.375;
-						down = data==0.75||data==.625||data==.875;
-						left = data==1||data==.125||data==.875;
-						right = data==.5||data==.375||data==.625;
+						up = data==0.25 || data==0.125 || data==.375;
+						down = data==0.75 || data==.625|| data==.875;
+						left = data==1 || data==.125 || data==.875;
+						right = data==.5 || data==.375 || data==.625;
 					}
 				}
 				setUp(up || y >= 0.7f);
 				setDown(down || y <= -0.7f);
 				setLeft(left || x <= -0.7f);
 				setRight(right || x >= 0.7f);
-			}else {
+			} else {
 				this.valid = false;
 				return false;
 			}

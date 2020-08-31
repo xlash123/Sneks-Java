@@ -2,6 +2,7 @@ package game.xlash.start;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 
 import game.xlash.display.Window;
@@ -23,7 +24,7 @@ public class Game {
 	
 	public static Rectangle field;
 	
-	public ArrayList<Controller> controllers;
+	public static ArrayList<Controller> controllers;
 	
 	public static int size = 15;
 	
@@ -32,6 +33,7 @@ public class Game {
 	public int foodCount = 3;
 	
 	public boolean redWin, blueWin, singleWin;
+	public int redPlayers, bluePlayers;
 	
 	public Game() {
 		snakes = new ArrayList<>();
@@ -57,13 +59,31 @@ public class Game {
 	}
 	
 	public void grabNewControllers() {
-		Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
-		this.controllers.clear();
-		for(int i=0; i<controllers.length; i++) {
-			if((controllers[i].getType()==Type.GAMEPAD || controllers[i].getType()==Type.STICK) && controllers[i].poll()) {
-				this.controllers.add(controllers[i]);
+		Controller[] controllers;
+		try {
+			controllers = createDefaultEnvironment().getControllers();
+			this.controllers.clear();
+			for (int i = 0; i < controllers.length; i++) {
+				if((controllers[i].getType()==Type.GAMEPAD || controllers[i].getType()==Type.STICK) && controllers[i].poll()) {
+					this.controllers.add(controllers[i]);
+				}
 			}
+		} catch (ReflectiveOperationException e) {
+			e.printStackTrace();
 		}
+	}
+	
+	private static ControllerEnvironment createDefaultEnvironment() throws ReflectiveOperationException {
+
+	    // Find constructor (class is package private, so we can't access it directly)
+	    Constructor<ControllerEnvironment> constructor = (Constructor<ControllerEnvironment>)
+	        Class.forName("net.java.games.input.DefaultControllerEnvironment").getDeclaredConstructors()[0];
+
+	    // Constructor is package private, so we have to deactivate access control checks
+	    constructor.setAccessible(true);
+
+	    // Create object with default constructor
+	    return constructor.newInstance();
 	}
 	
 	public void addSnakes(ArrayList<Snake> ss) {
@@ -72,13 +92,18 @@ public class Game {
 	
 	public void newGame() {
 		redWin = blueWin = singleWin = false;
-		grabNewControllers();
+		redPlayers = bluePlayers = 0;
+//		grabNewControllers();
 		foods.clear();
 		for(int i=0; i<snakes.size(); i++) {
 			Snake s = snakes.get(i);
 			s.reset((Game.window.getSize().width/4)/Game.size, (Game.window.getSize().height/4)/Game.size + i*5);
+			if (s.team == TeamEnum.RED)
+				redPlayers++;
+			else if (s.team == TeamEnum.BLUE)
+				bluePlayers++;
 		}
-		for(int i=0; i<foodCount; i++) {
+		for(int i = 0; i < foodCount; i++) {
 			foods.add(new Food(this));
 		}
 	}
@@ -89,19 +114,19 @@ public class Game {
 		int red = 0;
 		int blue = 0;
 		int none = 0;
-		for(Snake s : snakes) {
-			if(!s.dead) {
+		for (Snake s : snakes) {
+			if (!s.dead) {
 				alive++;
-				if(s.team==TeamEnum.RED) red++;
-				else if(s.team==TeamEnum.BLUE) blue++;
-				else if(s.team==TeamEnum.NONE) none++;
+				if (s.team == TeamEnum.RED) red++;
+				else if (s.team == TeamEnum.BLUE) blue++;
+				else if (s.team == TeamEnum.NONE) none++;
 			}
 		}
-		if(none==0 && (red == 0 || blue == 0)){
-			if(red==0) blueWin = true;
-			else redWin = true;
+		if (none == 0 && (red == 0 || blue == 0)){
+			if (red == 0 && bluePlayers > 0) blueWin = true;
+			else if (blue == 0 && redPlayers > 0) redWin = true;
 			return true;
-		}else if(alive <= 1) {
+		} else if (alive == 1) {
 			singleWin = true;
 			return true;
 		}
@@ -109,9 +134,7 @@ public class Game {
 	}
 	
 	public void gameLoop() {
-		while(true) {
-			
-			
+		while(true) {			
 			currentGui.update();
 			
 			window.repaint();

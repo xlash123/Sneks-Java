@@ -25,9 +25,9 @@ public abstract class Window {
 			}
 		};
 		panel.setDoubleBuffered(true);
-		panel.setBackground(new Color(45, 5, 45));
+		panel.setBackground(Color.black);
 		frame.setResizable(false);
-		panel.setPreferredSize(new Dimension(599, 599));
+		panel.setPreferredSize(new Dimension(793, 599));
 		InputListener input = new InputListener();
 		panel.addKeyListener(input);
 		panel.addMouseListener(input);

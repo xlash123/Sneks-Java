@@ -14,7 +14,10 @@ public class Start {
 	public static void main(String[] args) {
 		String os = System.getProperty("os.name").toLowerCase();
 		String arch = System.getProperty("os.arch").toLowerCase();
-		if(os.indexOf("win")>=0) {
+		boolean isWin = os.indexOf("win") >= 0;
+		boolean isMac = os.indexOf("mac") >= 0;
+		boolean isLinux = os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0;
+		if(isWin) {
 			if(arch.indexOf("64")>=0) {
 				load("jinput-dx8_64", ".dll");
 				load("jinput-raw_64", ".dll");
@@ -23,30 +26,27 @@ public class Start {
 				load("jinput-raw", ".dll");
 				load("jinput-wintab", ".dll");
 			}
-		}else if(os.indexOf("mac")>=0) {
+		}else if(isMac) {
 			load("jinput-osx", ".jnilib");
-		}else if(os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 ) {
+		}else if(isLinux) {
 			if(arch.indexOf("64")>=0) {
 				load("jinput-linux64", ".so");
 			}else {
 				load("jinput-linux", ".so");
 			}
 		}
-		System.setProperty("java.library.path", System.getProperty("java.io.tmpdir")+"Sneks_temp/jinput_natives;"+System.getProperty("java.library.path"));
+		System.setProperty("java.library.path", System.getProperty("java.io.tmpdir")+"/Sneks_temp/jinput_natives;"+System.getProperty("java.library.path"));
 		System.out.println("Path: " + System.getProperty("java.library.path"));
-		// try {
-		// 	Field fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");
-		// 	fieldSysPath.setAccessible(true);
-		// 	fieldSysPath.set(null, null);
-		// } catch (NoSuchFieldException e) {
-		// 	e.printStackTrace();
-		// } catch (SecurityException e) {
-		// 	e.printStackTrace();
-		// } catch (IllegalArgumentException e) {
-		// 	e.printStackTrace();
-		// } catch (IllegalAccessException e) {
-		// 	e.printStackTrace();
-		// }
+
+		if (isWin) {
+			 try {
+			 	Field fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");
+			 	fieldSysPath.setAccessible(true);
+			 	fieldSysPath.set(null, null);
+			 } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+			 	e.printStackTrace();
+			 }
+		}
 		game = new Game();
 	}
 	
